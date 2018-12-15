@@ -1,0 +1,13 @@
+<html>
+<head>
+<title> {{ template_name }} </title>
+</head>
+<body>
+
+<h1>My sensors: </h1>
+{% for i in sensors %}
+	{{ i }}
+{% endfor %}
+
+</body>
+</html>

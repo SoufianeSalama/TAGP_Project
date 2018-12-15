@@ -1,0 +1,13 @@
+<html>
+<head>
+<title> {{ template_name }} </title>
+</head>
+<body>
+
+My devices: 
+{% for i in devices %}
+	{{ i }}
+{% endfor %}
+
+</body>
+</html>

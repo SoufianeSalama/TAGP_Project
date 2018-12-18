@@ -60,16 +60,17 @@
           <tbody>
             {% for i in devices %}
                 <tr>
-                    <td>{{ i }}</td>
-                    <td>...</td>
-                    <td>...</td>
-                    <td>...</td>
+                    <td>{{ i.device_name }}</td>
+                    <td>{{ i.device_description }}</td>
+                    <td>{{ i.device_location }}</td>
+                    <td>{{ i.device_status }}</td>
                     <td><button type="button" class="btn btn-success">Turn on</button></td>
                 </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
+
       
 </main>
 

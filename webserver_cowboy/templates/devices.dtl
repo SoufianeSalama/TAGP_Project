@@ -64,7 +64,12 @@
                     <td>{{ i.device_description }}</td>
                     <td>{{ i.device_location }}</td>
                     <td>{{ i.device_status }}</td>
-                    <td><button type="button" class="btn btn-success">Turn on</button></td>
+                    <td>
+			<!--<form method="post" action="/deviceaction"> 
+				<input type="submit" class="btn btn-success" value="Turn on"/>
+			</form>-->
+	<button id="devicebutton" class="btn btn-success" onclick="sendServerPost('{{ i.device_name }}','{{ i.device_status }}')">Turn on</button>
+		     </td>
                 </tr>
             {% endfor %}
           </tbody>
@@ -77,6 +82,24 @@
 <footer>
 
 </footer>
+
+<script>
+	function sendServerPost(device_name, device_status){
+		//alert(device_name + "  " + device_status);
+		
+		$.post("/deviceaction",
+		{
+			devicename: device_name,
+			devicestatus: device_status
+			
+		},
+		function(data, status){
+			alert("Data " + data + "\nStatus: " + status);
+		});	
+	};
+
+
+</script>
 
 </body>
 </html>

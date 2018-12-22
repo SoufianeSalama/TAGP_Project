@@ -1,0 +1,30 @@
+<html>
+<head>
+<title> {{ template_name }} </title>
+</head>
+<body>
+
+<h1>My devices: </h1>
+<table style="width:100%;text-align:center;">
+<tr>
+	<th>Device Name</th>
+	<th>Device Location</th>
+	<th>Device Gpio</th>
+	<th>Device Status</th>
+	<th>Operation</th>
+</tr>
+
+{% for i in devices %}
+<tr>
+	<td>{{ i }}</td>
+<td></td>
+	<td></td>
+	<td></td>
+<td><input type="submit" value="activate"/></td>
+</tr>
+{% endfor %}
+
+</table>
+
+</body>
+</html>

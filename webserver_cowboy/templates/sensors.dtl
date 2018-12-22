@@ -13,7 +13,7 @@
 <header>
     <nav class="navbar navbar-expand-md bg-dark navbar-dark">
         <!-- Brand -->
-        <a class="navbar-brand" href="#">Cowboy Webserver</a>
+        <a class="navbar-brand" href="/devicesdynamic">Cowboy Webserver</a>
       
         <!-- Toggler/collapsibe Button -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
@@ -35,8 +35,8 @@
                     New
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#">Device</a>
-                  <a class="dropdown-item" href="#">Sensor</a>
+			<a class="dropdown-item" href="/devicesdynamic">Device</a>
+                  	<a class="dropdown-item" href="/sensorsdynamic">Sensor</a>
                 </div>
               </li>
           </ul>

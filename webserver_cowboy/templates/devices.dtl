@@ -68,7 +68,8 @@
 			<!--<form method="post" action="/deviceaction"> 
 				<input type="submit" class="btn btn-success" value="Turn on"/>
 			</form>-->
-	<button id="devicebutton" class="btn btn-success" onclick="sendServerPost('{{ i.device_name }}','{{ i.device_status }}')">Turn on</button>
+	<button id="devicebutton" class="btn btn-success" onclick="sendServerPost('{{ i.device_name }}',1)">Turn on</button>
+	<button id="devicebutton" class="btn btn-danger" onclick="sendServerPost('{{ i.device_name }}',0)">Turn off</button>
 		     </td>
                 </tr>
             {% endfor %}

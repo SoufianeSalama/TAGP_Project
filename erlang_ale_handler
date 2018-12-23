@@ -1,0 +1,14 @@
+-module(server).
+-export([response/0]).
+
+response() ->
+	receive 
+	 	on -> io:format("Activated"),
+			{ok, Gpio18} = gpio:start_link(18, output),
+			gpio:write(Gpio18, 1),
+			response();
+		off -> io:format("Deactivate"),
+			{ok, Gpio18} = gpio:start_link(18, output),
+                        gpio:write(Gpio18, 0),
+			response()
+	end.

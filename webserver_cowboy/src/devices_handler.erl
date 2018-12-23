@@ -1,39 +1,75 @@
 -module(devices_handler).
 -behavior(cowboy_handler).
 
--export([init/2, getDevices/0]).
+-export([init/2, getDevicesDyn/0, parseData/2, parseDataProperties/1]).
 
 init(Req0, State) ->
-	%Devicestable = ets:new(devicestable, []),
-	%ets:insert(Devicestable, [{Verwarming}],
-	%ets:insert(Devicestable, [{Oven}],
-	%ets:insert(Devicestable, [{Pomp}],
-	%ets:insert(Devicestable, [{Tuinlichten}],
 	{ok, Body} = devices_dtl:render([
 		{template_name, "Devices Manager"},
 		
-		{devices, getDevices()}
+		{devices, getDevicesDyn()}
 
 		]),
 	{ok, Req2} = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">>}, Body, Req0),	
 	{ok, Req2, State}.
 
-getDevices() ->
-	[
-		[
-		{device_name, "pomp"},
-		{device_description, "..."},
-		{device_location, "buiten"},
-		{device_status, "1"}
-		],
+%getDevicesStatic() ->
+%	[
+%		[
+%		{device_name, "pomp"},
+%		{device_description, "..."},
+%		{device_location, "buiten"},
+%		{device_status, "1"}
+%		],
+%
+%		[
+%		{device_name, "verwarming"},
+%		{device_description, "..."},
+%		{device_location, "binnen"},
+%		{device_status, "1"}
+%		]
+%	].
 
-		[
-		{device_name, "verwarming"},
-		{device_description, "..."},
-		{device_location, "binnen"},
-		{device_status, "1"}
-		]
-	].
+getDevicesDyn() ->
+	DevicesTable = ets:new(elementen, [bag]),%% Type, Name, Location, Status, GPIO
+	ets:insert(DevicesTable, {device, verwarming, binnen, 1, 18}),
+	ets:insert(DevicesTable, {device, pomp, buiten, 1, 23}),
+	ets:insert(DevicesTable, {device, oven, keuken, 0, 27}),
+	ets:insert(DevicesTable, {device, tuinlichten, tuin, 1, 25}),
+	{[Result]} = parseData(ets:lookup(DevicesTable, device), []),
+	Result.
+
+parseData([], Devices) ->
+	AllDevices = [Devices],
+	{AllDevices};
+
+parseData([Head|Tail], Devices) ->
+	AllDevices = lists:append(Devices, parseDataProperties(Head)),
+	parseData(Tail, AllDevices).
+
+parseDataProperties(DeviceProperties) ->
+	{Type, Name, Location, Status, Gpio} = DeviceProperties,
+	DeviceList = [
+		{"device_type", Type},
+		{"device_name", Name},
+		{"device_location", Location},
+		{"device_status", Status},
+		{"device_gpio", Gpio}
+	],
+	ReturnList = [DeviceList],
+	ReturnList.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 %github.com/erlydtl/erlydtl/wiki

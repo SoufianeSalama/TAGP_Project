@@ -1,7 +1,7 @@
 -module(deviceaction_handler).
 -behavior(cowboy_handler).
 
--export([init/2, changeDeviceStatus/2]).
+-export([init/2, changeDeviceStatus/2, updateTable/2]).
 
 init(Req0, Opts) ->
 	Method = cowboy_req:method(Req0),
@@ -39,10 +39,12 @@ echo(undefined, undefined, Req) ->
 
 echo(DeviceName, DeviceStatus,Req) ->
 	io:format("Devicename: ~p~nDeviceStatus: ~p~n", [DeviceName, DeviceStatus]),
-	net_kernel:connect_node('server@127.0.0.1'),
-	ServerPid = rpc:call('server@127.0.0.1', erlang, list_to_pid, ["<0.154.0>"]),
+	updateTable(DeviceName,DeviceStatus),
+	% io:format("Check for table: ~n: ~p~n", [ets:match_object(devicetable, {'_', '_', '_', '_'})]),
+	%%net_kernel:connect_node('server@127.0.0.1'),
+	%%ServerPid = rpc:call('server@127.0.0.1', erlang, list_to_pid, ["<0.154.0>"]),
 	%%ServerPid ! on,
-	changeDeviceStatus(DeviceStatus, ServerPid),
+	%%changeDeviceStatus(DeviceStatus, ServerPid),
 	cowboy_req:reply(200, #{
 		<<"content-type">> => <<"text/plain; charset=utf-8">>
 	},[DeviceName,DeviceStatus], Req).
@@ -53,3 +55,13 @@ changeDeviceStatus(<<"0">>, ServerPid) ->
 	ServerPid ! off;
 changeDeviceStatus(_, ServerPid) ->
 	ServerPid.
+
+updateTable(DeviceName, <<"1">>) ->
+	[{DeviceNameEts, DeviceLocationEts, _, DeviceGpioEts}] =  ets:match_object(devicetable, {binary_to_atom(DeviceName, latin1), '_', '_', '_'}),
+	ets:delete(devicetable, binary_to_atom(DeviceName, latin1)),
+	ets:insert(devicetable, {DeviceNameEts, DeviceLocationEts, 1, DeviceGpioEts});
+
+updateTable(DeviceName, <<"0">>) ->
+	[{DeviceNameEts, DeviceLocationEts, _, DeviceGpioEts}] = ets:match_object(devicetable, {binary_to_atom(DeviceName, latin1), '_', '_', '_'}),		
+	ets:delete(devicetable, binary_to_atom(DeviceName, latin1)),
+	ets:insert(devicetable, {DeviceNameEts, DeviceLocationEts, 0, DeviceGpioEts}).

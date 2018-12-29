@@ -13,30 +13,21 @@ init(Req0, State) ->
 	{ok, Req2} = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">>}, Body, Req0),	
 	{ok, Req2, State}.
 
-%getDevicesStatic() ->
-%	[
-%		[
-%		{device_name, "pomp"},
-%		{device_description, "..."},
-%		{device_location, "buiten"},
-%		{device_status, "1"}
-%		],
-%
-%		[
-%		{device_name, "verwarming"},
-%		{device_description, "..."},
-%		{device_location, "binnen"},
-%		{device_status, "1"}
-%		]
-%	].
 
 getDevicesDyn() ->
-	DevicesTable = ets:new(elementen, [bag]),%% Type, Name, Location, Status, GPIO
-	ets:insert(DevicesTable, {device, verwarming, binnen, 1, 18}),
-	ets:insert(DevicesTable, {device, pomp, buiten, 1, 23}),
-	ets:insert(DevicesTable, {device, oven, keuken, 0, 27}),
-	ets:insert(DevicesTable, {device, tuinlichten, tuin, 1, 25}),
-	{[Result]} = parseData(ets:lookup(DevicesTable, device), []),
+	% DevicesTable = ets:new(elementen, [bag]),%% Type, Name, Location, Status, GPIO
+	% ets:insert(DevicesTable, {device, verwarming, binnen, 1, 18}),
+	% ets:insert(DevicesTable, {device, pomp, buiten, 1, 23}),
+	% ets:insert(DevicesTable, {device, oven, keuken, 0, 27}),
+	% ets:insert(DevicesTable, {device, tuinlichten, tuin, 1, 25}),
+	% {[Result]} = parseData(ets:lookup(DevicesTable, device), []),
+	% Result.
+	% ets:new(devicetable, [named_table, bag]),%% Type, Name, Location, Status, GPIO
+	% ets:insert(devicetable, {verwarming, binnen, 1, 18}),
+	% ets:insert(devicetable, {pomp, buiten, 1, 23}),
+	% ets:insert(devicetable, {oven, keuken, 0, 27}),
+	% ets:insert(devicetable, {tuinlicht, tuin, 1, 25}),
+	{[Result]} = parseData(ets:match_object(devicetable, {'_', '_', '_', '_'}), []),
 	Result.
 
 parseData([], Devices) ->
@@ -48,9 +39,10 @@ parseData([Head|Tail], Devices) ->
 	parseData(Tail, AllDevices).
 
 parseDataProperties(DeviceProperties) ->
-	{Type, Name, Location, Status, Gpio} = DeviceProperties,
+	% {Type, Name, Location, Status, Gpio} = DeviceProperties,
+	{Name, Location, Status, Gpio} = DeviceProperties,
 	DeviceList = [
-		{"device_type", Type},
+		% {"device_type", Type},
 		{"device_name", Name},
 		{"device_location", Location},
 		{"device_status", Status},
@@ -68,6 +60,22 @@ parseDataProperties(DeviceProperties) ->
 
 
 
+%getDevicesStatic() ->
+%	[
+%		[
+%		{device_name, "pomp"},
+%		{device_description, "..."},
+%		{device_location, "buiten"},
+%		{device_status, "1"}
+%		],
+%
+%		[
+%		{device_name, "verwarming"},
+%		{device_description, "..."},
+%		{device_location, "binnen"},
+%		{device_status, "1"}
+%		]
+%	].
 
 
 

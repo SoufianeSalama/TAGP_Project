@@ -1,12 +1,12 @@
 -module(devices_handler).
 -behavior(cowboy_handler).
 
--export([init/2, getDevicesDyn/0, parseData/2, parseDataProperties/1]).
+-export([init/2, getDevicesDyn/0, parseData/2, parseDataProperties/1, checkConnection/1]).
 
 init(Req0, State) ->
 	{ok, Body} = devices_dtl:render([
 		{template_name, "Devices Manager"},
-		
+		{connection, checkConnection(nodes())},
 		{devices, getDevicesDyn()}
 
 		]),
@@ -51,6 +51,13 @@ parseDataProperties(DeviceProperties) ->
 	ReturnList = [DeviceList],
 	ReturnList.
 
+checkConnection([]) ->
+		0;
+	%% Als nodes() een lege lijst is, is er geen connectie met de erlang ale node
+checkConnection([_|_]) ->
+		1.
+	%% Als nodes() geen lege lijst is, dan is er normaal connectie met de erlang ale node
+	%% deze node kan bijvoorbeeld gpioserver@127.0.0.1 zijn (zie vm.args voor cookies enz.)
 
 
 

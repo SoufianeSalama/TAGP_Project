@@ -12,6 +12,8 @@
 <body>
 <header>
     <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+        <div class="container">
+
         <!-- Brand -->
         <a class="navbar-brand" href="/devicesdynamic">Cowboy Webserver</a>
       
@@ -22,7 +24,19 @@
       
         <!-- Navbar links -->
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
-          <ul class="navbar-nav">
+          <ul class="navbar-nav ml-auto">
+
+           <li class="nav-item dropdown">
+              {% if connection %}
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown" style="color: chartreuse" >Connected</a>
+              {% else %}
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown" style="color:red">Not Connected</a>
+              {% endif %}
+              <div class="dropdown-menu">
+                <a class="dropdown-item" data-toggle="modal" data-target="#connectionModal">PID</a>
+              </div>
+            </li>
+
             <li class="nav-item">
               <a class="nav-link" href="#">Devices</a>
             </li>
@@ -41,6 +55,7 @@
               </li>
           </ul>
         </div> 
+        </div>
       </nav>
 </header>
 
@@ -84,7 +99,7 @@
 
 </footer>
 
-<!-- Modal -->
+<!-- Modal New Device-->
 <div id="newDeviceModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
@@ -110,6 +125,40 @@
 
         <div class="form-group">
             <button type="button" id="addDeviceBtn" class="btn btn-info" onclick="newDevice()">Add Device</button>
+          </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Connection-->
+<div id="connectionModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Connection with Erlang ALE process</h4>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-group">
+          <label for="pid">PID:</label>
+          <input type="text" class="form-control" id="pid">
+        </div>
+
+        <div class="form-group">
+          <label for="node">Node name:</label>
+          <input type="text" class="form-control" id="node" value="'server@127.0.0.1'">
+        </div>
+
+        <div class="form-group">
+            <button type="button" id="saveConnectionParam" class="btn btn-info" onclick="saveConnectionParam()">Save</button>
           </div>
 
       </div>
@@ -150,6 +199,18 @@
         location.reload();
       });	
     };
+
+    function saveConnectionParam(){
+      $.post("/addpid",
+      {
+        pid: $("#pid").val(),
+        node: $("#node").val(),
+      },
+      function(data, status){
+        alert("Data " + data + "\nStatus: " + status);
+        //location.reload();
+      });
+    }
 
 
 </script>

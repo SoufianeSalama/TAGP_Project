@@ -13,7 +13,9 @@ start(_Type, _Args) ->
 		{"/sensorsdynamic", sensors_handler, []},
 
 		{"/deviceaction", deviceaction_handler, []},		
-		{"/newdevice", newdevice_handler, []},		
+		{"/newdevice", newdevice_handler, []},	
+
+		{"/addpid", addpid_handler, []},	
 	
 		{"/devices", cowboy_static, {priv_file, webserver_cowboy, "devices.html"}},
 		{"/devices.css", cowboy_static, {priv_file, webserver_cowboy, "devices.css"}},

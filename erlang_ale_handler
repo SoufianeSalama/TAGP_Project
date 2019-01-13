@@ -1,14 +1,39 @@
 -module(server).
--export([response/0]).
+-export([response/0, changeDeviceStatus/2, getSensorsValue/1]).
+
+% response() ->
+%       receive
+%               on -> io:format("Activated"),
+%                       {ok, Gpio18} = gpio:start_link(18, output),
+%                       gpio:write(Gpio18, 1),
+%                       response();
+%               off -> io:format("Deactivate"),
+%                       {ok, Gpio18} = gpio:start_link(18, output),
+%                         gpio:write(Gpio18, 0),
+%                       response()
+%       end.
 
 response() ->
-	receive 
-	 	on -> io:format("Activated"),
-			{ok, Gpio18} = gpio:start_link(18, output),
-			gpio:write(Gpio18, 1),
-			response();
-		off -> io:format("Deactivate"),
-			{ok, Gpio18} = gpio:start_link(18, output),
-                        gpio:write(Gpio18, 0),
-			response()
-	end.
+        receive
+                {DeviceStatus, DeviceGpio} ->
+                        changeDeviceStatus(DeviceStatus,DeviceGpio),
+                        response();
+                {request, From, SensorId} ->
+                        SensorValue = getSensorsValue(SensorId),
+                        From ! SensorValue,
+                        response()
+        end.
+
+getSensorsValue(SensorsId) ->
+        {ok, Arduino} = i2c:start_link("i2c-1", 16#08),
+        ValueStringAscii = binary_to_list(i2c:read(Arduino, 1)), % -> Geeft bijvoorbeeld "@" voor de waarde 64 (ASCII) en ik heb 64 nodig
+        ValueStringInteger = lists:flatmap(fun erlang:integer_to_list/1, ValueStringAscii),
+        list_to_integer(ValueStringInteger).
+
+changeDeviceStatus(0, DeviceGpio) ->
+        {ok, Gpio} = gpio:start_link(DeviceGpio, output),
+        gpio:write(Gpio, 0);
+
+changeDeviceStatus(1, DeviceGpio) ->
+        {ok, Gpio} = gpio:start_link(DeviceGpio, output),
+        gpio:write(Gpio, 1).

@@ -1,7 +1,7 @@
 -module(deviceaction_handler).
 -behavior(cowboy_handler).
 
--export([init/2, changeDeviceStatus/2, updateTable/2]).
+-export([init/2, changeDeviceStatus/3, updateTable/2]).
 
 init(Req0, Opts) ->
 	Method = cowboy_req:method(Req0),
@@ -45,23 +45,43 @@ echo(DeviceName, DeviceStatus,Req) ->
 	%%ServerPid = rpc:call('server@127.0.0.1', erlang, list_to_pid, ["<0.154.0>"]),
 	%%ServerPid ! on,
 	%%changeDeviceStatus(DeviceStatus, ServerPid),
+
+
 	cowboy_req:reply(200, #{
 		<<"content-type">> => <<"text/plain; charset=utf-8">>
 	},[DeviceName,DeviceStatus], Req).
 
-changeDeviceStatus(<<"1">>, ServerPid) ->
-	ServerPid ! on;
-changeDeviceStatus(<<"0">>, ServerPid) ->
-	ServerPid ! off;
-changeDeviceStatus(_, ServerPid) ->
-	ServerPid.
+changeDeviceStatus(1, DeviceGpio, ServerPid) ->
+	% ServerPid ! on;
+	io:format("ON - Serverpid: : ~p~n GPIO: ~p", [ServerPid, DeviceGpio]),
+	ServerPid ! {1, DeviceGpio};
+
+changeDeviceStatus(0, DeviceGpio, ServerPid) ->
+	io:format("OFF - Serverpid: : ~p~n GPIO: ~p", [ServerPid, DeviceGpio]),
+	ServerPid ! {0, DeviceGpio}.
+
 
 updateTable(DeviceName, <<"1">>) ->
 	[{DeviceNameEts, DeviceLocationEts, _, DeviceGpioEts}] =  ets:match_object(devicetable, {binary_to_atom(DeviceName, latin1), '_', '_', '_'}),
 	ets:delete(devicetable, binary_to_atom(DeviceName, latin1)),
-	ets:insert(devicetable, {DeviceNameEts, DeviceLocationEts, 1, DeviceGpioEts});
+	ets:insert(devicetable, {DeviceNameEts, DeviceLocationEts, 1, DeviceGpioEts}),
+
+	[{_, ErlangPid}] = ets:match_object(pipes, {serverpid, '_'}),
+	[{_, ErlangNode}] = ets:match_object(pipes, {servernode, '_'}),
+
+	ErlangNodePid = rpc:call(ErlangNode, erlang, list_to_pid, [ErlangPid]),
+
+	changeDeviceStatus(1,DeviceGpioEts , ErlangNodePid);
+
 
 updateTable(DeviceName, <<"0">>) ->
 	[{DeviceNameEts, DeviceLocationEts, _, DeviceGpioEts}] = ets:match_object(devicetable, {binary_to_atom(DeviceName, latin1), '_', '_', '_'}),		
 	ets:delete(devicetable, binary_to_atom(DeviceName, latin1)),
-	ets:insert(devicetable, {DeviceNameEts, DeviceLocationEts, 0, DeviceGpioEts}).
+	ets:insert(devicetable, {DeviceNameEts, DeviceLocationEts, 0, DeviceGpioEts}),
+
+	[{_, ErlangPid}] = ets:match_object(pipes, {serverpid, '_'}),
+	[{_, ErlangNode}] = ets:match_object(pipes, {servernode, '_'}),
+
+	ErlangNodePid = rpc:call(ErlangNode, erlang, list_to_pid, [ErlangPid]),
+
+	changeDeviceStatus(0,DeviceGpioEts , ErlangNodePid).

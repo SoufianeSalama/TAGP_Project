@@ -1,7 +1,7 @@
 -module(addpid_handler).
 -behavior(cowboy_handler).
 
--export([init/2, makeConnection/1]).
+-export([init/2, makeConnection/0]).
 
 init(Req0, Opts) ->
 	Method = cowboy_req:method(Req0),
@@ -26,13 +26,16 @@ echo(undefined,undefined, Req) ->
 	cowboy_req:reply(400, [], <<"Missing connection parameters.">>, Req);
 
 echo(PID,NodeName, Req) ->
-	ets:insert(pipes, {serverpid, binary_to_atom(PID, latin1)}),
-	ets:insert(pipes, {servernodename, binary_to_atom(NodeName, latin1)}),
-	io:format("PID: ~p~nNode: ~p~n", [binary_to_atom(PID, latin1), binary_to_atom(NodeName, latin1)]),
-	makeConnection(NodeName),
+	ets:insert(pipes, {serverpid, binary_to_list(PID)}),
+	% ets:insert(pipes, {servernodename, binary_to_atom(NodeName, latin1)}),
+	% io:format("PID: ~p~nNode: ~p~n", [PID,NodeName]),
+	% io:format("PID: ~p~nNode: ~p~n", [binary_to_atom(PID, latin1), binary_to_atom(NodeName, latin1)]),
+	io:format("PID: ~p~nNode: ~p~n", [binary_to_list(PID), binary_to_list(NodeName)]),
+	makeConnection(),
 	cowboy_req:reply(200, #{
 		<<"content-type">> => <<"text/plain; charset=utf-8">>
 	},[PID,NodeName], Req).
 
-makeConnection(NodeName) ->
-	net_kernel:connect_node(binary_to_atom(NodeName, latin1)).
+makeConnection() ->
+	[{_, ErlangNode}] = ets:match_object(pipes, {servernode, '_'}),
+	net_kernel:connect_node(ErlangNode).

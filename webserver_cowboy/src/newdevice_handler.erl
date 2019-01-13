@@ -28,7 +28,9 @@ echo(undefined, undefined, undefined, Req) ->
 	cowboy_req:reply(400, [], <<"Missing devices parameters.">>, Req);
 
 echo(DeviceName, DeviceLocation, DeviceGpio, Req) ->
-	ets:insert(devicetable, {binary_to_atom(DeviceName, latin1), binary_to_atom(DeviceLocation, latin1), 0, binary_to_atom(DeviceGpio, latin1)}),
+	io:format("New device: ~p~n", [DeviceGpio]),
+
+	ets:insert(devicetable, {binary_to_atom(DeviceName, latin1), binary_to_atom(DeviceLocation, latin1), 0, list_to_integer(binary_to_list(DeviceGpio))}),
 	cowboy_req:reply(200, #{
 		<<"content-type">> => <<"text/plain; charset=utf-8">>
 	},[DeviceName,DeviceLocation,DeviceGpio], Req).

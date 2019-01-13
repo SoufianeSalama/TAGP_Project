@@ -13,7 +13,12 @@ init(Req0, State) ->
 	{ok, Req2, State}.
 
 getSensorsDyn() ->
-	{[Result]} = parseData(ets:match_object(sensortable, {'_', '_', '_', '_'}), []),
+	% First update ets:table with sensor status
+	[{SensorName, SensorLocation, _}] = ets:match_object(sensortable, {mq2, '_', '_'}),
+	ets:delete(sensortable, SensorName),
+	ets:insert(sensortable, {SensorName, SensorLocation, getSensorValue()}),
+
+	{[Result]} = parseData(ets:match_object(sensortable, {'_', '_', '_'}), []),
 	Result.
 
 parseData([], Sensors) ->
@@ -25,14 +30,13 @@ parseData([Head|Tail], Sensors) ->
 	parseData(Tail, AllSensors).
 
 parseDataProperties(SensorProperties) ->
-	% {Type, Name, Location, Status, Gpio} = DeviceProperties,
-	{Name, Location, _, Gpio} = SensorProperties,
+	{Name, Location, Value} = SensorProperties,
+
 	SensorList = [
 		% {"device_type", Type},
 		{"sensor_name", Name},
 		{"sensor_location", Location},
-		{"sensor_status", getSensorValue()},
-		{"sensor_gpio", Gpio}
+		{"sensor_status", Value}
 	],
 	ReturnList = [SensorList],
 	ReturnList.
@@ -46,13 +50,24 @@ checkConnection([_|_]) ->
 
 getSensorValue() ->
 	%% From erlang ale process
-	net_kernel:connect_node('server@127.0.0.1'),
-	ServerPid = rpc:call('server@127.0.0.1', erlang, list_to_pid, ["<0.146.0>"]),
-	ServerPid ! {request, self(), 1},
-	receive
-		Sensor ->
-			Sensor
+	% net_kernel:connect_node('server@127.0.0.1'),
+	% ServerPid = rpc:call('server@127.0.0.1', erlang, list_to_pid, ["<0.146.0>"]),
+	Value = checkConnection(nodes()),
+	if
+	Value==0 ->
+		0;
+	true ->
+		[{_, ErlangPid}] = ets:match_object(pipes, {serverpid, '_'}),
+		[{_, ErlangNode}] = ets:match_object(pipes, {servernode, '_'}),
+
+		ErlangNodePid = rpc:call(ErlangNode, erlang, list_to_pid, [ErlangPid]),
+		ErlangNodePid ! {request, self(), 1},
+		receive
+			Sensor ->
+				Sensor
+		end
 	end.
+	
 
 %github.com/erlydtl/erlydtl/wiki
 %init(Req0, State) ->

@@ -9,16 +9,18 @@ start_link() ->
 
 init([]) ->
 	ets:new(devicetable, [named_table, bag, public]),%% Name, Location, Status, GPIO
-	ets:insert(devicetable, {verwarming, binnen, 1, 18}),
-	ets:insert(devicetable, {pomp, buiten, 1, 23}),
-	ets:insert(devicetable, {oven, keuken, 0, 27}),
-	ets:insert(devicetable, {tuinlichten, tuin, 1, 25}),
+	ets:insert(devicetable, {verwarming, binnen, 0, 18}),
+	ets:insert(devicetable, {pomp, buiten, 0, 23}),
+	ets:insert(devicetable, {oven, keuken, 0, 24}),
+	ets:insert(devicetable, {tuinlichten, tuin, 0, 22}),
+	ets:insert(devicetable, {tv, tuin, 0, 27}),
 
 	ets:new(sensortable, [named_table, bag, public]),%% Name, Location, Status, GPIO
-	ets:insert(sensortable, {pir, binnen, analog, 0}),
-	ets:insert(sensortable, {mq2, binnen, analog, 0}),
+	ets:insert(sensortable, {mq2, binnen, nodata}),
 
 	ets:new(pipes, [named_table, public]),%% Type, Name, Location, Status, GPIO
+	ets:insert(pipes, {servernode, 'server@127.0.0.1'}),
+
 
 
 	Procs = [],

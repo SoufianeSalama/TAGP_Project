@@ -12,6 +12,8 @@
 <body>
 <header>
     <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+
+     <div class="container">
         <!-- Brand -->
         <a class="navbar-brand" href="/devicesdynamic">Cowboy Webserver</a>
       
@@ -30,29 +32,19 @@
               {% else %}
                 <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown" style="color:red">Not Connected</a>
               {% endif %}
-              <div class="dropdown-menu">
-                <a class="dropdown-item" data-toggle="modal" data-target="#connectionModal">PID</a>
-              </div>
+              
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="#">Devices</a>
+              <a class="nav-link" href="/devicesdynamic">Devices</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Sensors</a>
+              <a class="nav-link" href="/sensorsdynamic">Sensors</a>
             </li>
 
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                    New
-                </a>
-                <div class="dropdown-menu">
-			<a class="dropdown-item" href="/devicesdynamic">Device</a>
-                  	<a class="dropdown-item" href="/sensorsdynamic">Sensor</a>
-                </div>
-              </li>
           </ul>
         </div> 
+        </div>
       </nav>
 </header>
 

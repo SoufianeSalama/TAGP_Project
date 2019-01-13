@@ -38,10 +38,10 @@
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="#">Devices</a>
+              <a class="nav-link" href="/devicesdynamic">Devices</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Sensors</a>
+              <a class="nav-link" href="/sensorsdynamic">Sensors</a>
             </li>
 
             <li class="nav-item dropdown">
@@ -50,7 +50,6 @@
                 </a>
                 <div class="dropdown-menu">
                    <a class="dropdown-item" data-toggle="modal" data-target="#newDeviceModal">Device</a>
-                  <a class="dropdown-item" href="/sensorsdynamic">Sensor</a>
                 </div>
               </li>
           </ul>
@@ -66,7 +65,7 @@
           <thead>
             <tr>
               <th>Name</th>
-              <th>Description</th>
+              <th>GPIO</th>
               <th>Location</th>
               <th>Status</th>
               <th>Action</th>
@@ -76,7 +75,7 @@
             {% for i in devices %}
                 <tr>
                     <td>{{ i.device_name }}</td>
-                    <td>{{ i.device_description }}</td>
+                    <td>{{ i.device_gpio }}</td>
                     <td>{{ i.device_location }}</td>
                     <td>{{ i.device_status }}</td>
                     <td>
@@ -149,7 +148,7 @@
 
         <div class="form-group">
           <label for="pid">PID:</label>
-          <input type="text" class="form-control" id="pid">
+          <input type="text" class="form-control" id="pid" value="<0.XXX.0>"/>
         </div>
 
         <div class="form-group">
@@ -207,8 +206,8 @@
         node: $("#node").val(),
       },
       function(data, status){
-        alert("Data " + data + "\nStatus: " + status);
-        //location.reload();
+        //alert("Data " + data + "\nStatus: " + status);
+        location.reload();
       });
     }
 
